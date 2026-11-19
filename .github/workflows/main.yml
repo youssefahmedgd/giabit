@@ -1,0 +1,35 @@
+name: Build GizaBit APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract ZIP
+        run: unzip -q GizaBit_Android_APK_Project.zip -d extracted
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build APK
+        run: |
+          cd extracted/GizaBit_Android_APK_Project
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GizaBit-APK
+          path: extracted/GizaBit_Android_APK_Project/app/build/outputs/apk/debug/*.apk
